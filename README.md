@@ -1,8 +1,7 @@
-[Site](https://claude.ai/public/artifacts/573a3a60-8a6e-4887-b226-84896b69cfa0)
-
 # 🚀 AI Tutor - Interactive Learning Routine
 
 A comprehensive 12-week AI/ML learning program designed specifically for software engineers. This interactive program combines theoretical foundations with hands-on projects, progressing from basic machine learning concepts to advanced AI applications.
+[A tutor web page.](https://claude.ai/public/artifacts/573a3a60-8a6e-4887-b226-84896b69cfa0)
 
 ## 📋 Program Overview
 
