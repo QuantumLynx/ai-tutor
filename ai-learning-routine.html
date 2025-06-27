@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Learning Routine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .progress-tracker {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 3px solid #e9ecef;
+        }
+        
+        .week-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .week-btn {
+            padding: 8px 16px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .week-btn.active {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .week-content {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        .week-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .day-card {
+            background: white;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .day-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .day-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .day-number {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .day-title {
+            font-size: 1.3em;
+            flex-grow: 1;
+            margin-left: 20px;
+        }
+        
+        .time-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        .day-content {
+            padding: 25px;
+        }
+        
+        .session {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .session h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+        
+        .session ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .session li {
+            margin: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .session li:before {
+            content: "→";
+            position: absolute;
+            left: 0;
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        .resource-link {
+            color: #e74c3c;
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+        
+        .resource-link:hover {
+            border-bottom-color: #e74c3c;
+        }
+        
+        .practice-box {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        
+        .practice-box h5 {
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+        
+        .milestone {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .milestone h3 {
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+        
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #3498db;
+            border-radius: 4px;
+            margin-right: 10px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .checkbox.checked {
+            background: #3498db;
+        }
+        
+        .checkbox.checked:after {
+            content: "✓";
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            top: -2px;
+            left: 3px;
+        }
+        
+        .progress-bar {
+            background: #ecf0f1;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3498db, #2ecc71);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 AI Mastery Journey</h1>
+            <p>12-Week Intensive Program for Software Engineers</p>
+        </div>
+        
+        <div class="progress-tracker">
+            <div class="week-selector">
+                <button class="week-btn active" onclick="showWeek(1)">Week 1-2</button>
+                <button class="week-btn" onclick="showWeek(2)">Week 3-4</button>
+                <button class="week-btn" onclick="showWeek(3)">Week 5-6</button>
+                <button class="week-btn" onclick="showWeek(4)">Week 7-8</button>
+                <button class="week-btn" onclick="showWeek(5)">Week 9-10</button>
+                <button class="week-btn" onclick="showWeek(6)">Week 11-12</button>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Week 1-2: Foundations -->
+        <div class="week-content active" id="week1">
+            <div class="milestone">
+                <h3>🎯 Phase 1: AI/ML Foundations</h3>
+                <p>Build solid theoretical foundation while getting hands-on</p>
+            </div>
+
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">1</div>
+                    <div class="day-title">AI Landscape & Python ML Setup</div>
+                    <div class="time-badge">2 hours</div>
+                </div>
+                <div class="day-content">
+                    <div class="session">
+                        <h4>📚 Theory (45 min)</h4>
+                        <ul>
+                            <li>Watch <a href="#" class="resource-link">Andrew Ng's AI for Everyone (Week 1)</a></li>
+                            <li>Read AI vs ML vs Deep Learning distinctions</li>
+                            <li>Overview: Supervised vs Unsupervised vs Reinforcement Learning</li>
+                        </ul>
+                    </div>
+                    <div class="session">
+                        <h4>💻 Hands-on (75 min)</h4>
+                        <ul>
+                            <li>Set up Python environment (Anaconda/venv)</li>
+                            <li>Install key libraries: numpy, pandas, scikit-learn, matplotlib</li>
+                            <li>First ML script: Load iris dataset, basic exploration</li>
+                        </ul>
+                        <div class="practice-box">
+                            <h5>🎯 Practice Goal</h5>
+                            <p>Complete a simple data loading and visualization script</p>
+                        </div>
+                    </div>
+                    <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>Day 1 Complete</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">2</div>
+                    <div class="day-title">Data Preprocessing & First Model</div>
+                    <div class="time-badge">2 hours</div>
+                </div>
+                <div class="day-content">
+                    <div class="session">
+                        <h4>📚 Theory (30 min)</h4>
+                        <ul>
+                            <li>Data preprocessing importance</li>
+                            <li>Feature scaling, encoding categorical variables</li>
+                            <li>Train/validation/test splits</li>
+                        </ul>
+                    </div>
+                    <div class="session">
+                        <h4>💻 Hands-on (90 min)</h4>
+                        <ul>
+                            <li>Pandas deep dive: cleaning, transforming data</li>
+                            <li>Build your first classifier (logistic regression)</li>
+                            <li>Evaluate model performance (accuracy, confusion matrix)</li>
+                        </ul>
+                        <div class="practice-box">
+                            <h5>🎯 Practice Goal</h5>
+                            <p>Train a model that predicts with >90% accuracy on iris dataset</p>
+                        </div>
+                    </div>
+                    <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>Day 2 Complete</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Continue with days 3-14 for weeks 1-2 -->
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">3-7</div>
+                    <div class="day-title">Core ML Algorithms</div>
+                    <div class="time-badge">2 hours/day</div>
+                </div>
+                <div class="day-content">
+                    <div class="session">
+                        <h4>📅 Daily Focus Areas</h4>
+                        <ul>
+                            <li><strong>Day 3:</strong> Decision Trees & Random Forest</li>
+                            <li><strong>Day 4:</strong> Support Vector Machines</li>
+                            <li><strong>Day 5:</strong> K-Means Clustering</li>
+                            <li><strong>Day 6:</strong> Cross-validation & Hyperparameter tuning</li>
+                            <li><strong>Day 7:</strong> End-to-end project: Titanic dataset</li>
+                        </ul>
+                    </div>
+                    <div class="practice-box">
+                        <h5>🎯 Week 1 Goal</h5>
+                        <p>Complete Kaggle Titanic competition with score >0.80</p>
+                    </div>
+                    <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>Week 1 Complete</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 3-4: Deep Learning Foundations -->
+        <div class="week-content" id="week2">
+            <div class="milestone">
+                <h3>🧠 Phase 2: Deep Learning Foundations</h3>
+                <p>Neural networks, TensorFlow/PyTorch, computer vision basics</p>
+            </div>
+
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">8-14</div>
+                    <div class="day-title">Neural Networks & Deep Learning</div>
+                    <div class="time-badge">2 hours/day</div>
+                </div>
+                <div class="day-content">
+                    <div class="session">
+                        <h4>📅 Daily Breakdown</h4>
+                        <ul>
+                            <li><strong>Day 8:</strong> Neural network theory, perceptrons</li>
+                            <li><strong>Day 9:</strong> TensorFlow/Keras setup, first neural network</li>
+                            <li><strong>Day 10:</strong> Convolutional Neural Networks (CNNs)</li>
+                            <li><strong>Day 11:</strong> Image classification project (CIFAR-10)</li>
+                            <li><strong>Day 12:</strong> Recurrent Neural Networks (RNNs/LSTM)</li>
+                            <li><strong>Day 13:</strong> Transfer learning with pre-trained models</li>
+                            <li><strong>Day 14:</strong> Build custom image classifier</li>
+                        </ul>
+                    </div>
+                    <div class="practice-box">
+                        <h5>🎯 Week 2 Goal</h5>
+                        <p>Deploy an image classifier web app using your trained model</p>
+                    </div>
+                    <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>Week 2 Complete</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 5-6: NLP & Language Models -->
+        <div class="week-content" id="week3">
+            <div class="milestone">
+                <h3>💬 Phase 3: NLP & Language Models</h3>
+                <p>Text processing, transformers, fine-tuning models</p>
+            </div>
+
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">15-21</div>
+                    <div class="day-title">Natural Language Processing</div>
+                    <div class="time-badge">2 hours/day</div>
+                </div>
+                <div class="day-content">
+                    <div class="session">
+                        <h4>📅 NLP Journey</h4>
+                        <ul>
+                            <li><strong>Day 15:</strong> Text preprocessing, tokenization, embeddings</li>
+                            <li><strong>Day 16:</strong> Sentiment analysis with traditional ML</li>
+                            <li><strong>Day 17:</strong> Introduction to transformers & BERT</li>
+                            <li><strong>Day 18:</strong> Hugging Face library, pre-trained models</li>
+                            <li><strong>Day 19:</strong> Fine-tuning BERT for classification</li>
+                            <li><strong>Day 20:</strong> GPT models & text generation</li>
+                            <li><strong>Day 21:</strong> Build a chatbot or text summarizer</li>
+                        </ul>
+                    </div>
+                    <div class="practice-box">
+                        <h5>🎯 Week 3 Goal</h5>
+                        <p>Create a production-ready sentiment analysis API</p>
+                    </div>
+                    <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>Week 3 Complete</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 7-8: MLOps & Production -->
+        <div class="week-content" id="week4">
+            <div class="milestone">
+                <h3>🚀 Phase 4: MLOps & Production</h3>
+                <p>Model deployment, monitoring, automation pipelines</p>
+            </div>
+
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">22-28</div>
+                    <div class="day-title">Production ML Systems</div>
+                    <div class="time-badge">2 hours/day</div>
+                </div>
+                <div class="day-content">
+                    <div class="session">
+                        <h4>📅 MLOps Focus</h4>
+                        <ul>
+                            <li><strong>Day 22:</strong> Docker for ML, containerizing models</li>
+                            <li><strong>Day 23:</strong> FastAPI for ML model serving</li>
+                            <li><strong>Day 24:</strong> Cloud deployment (AWS/GCP/Azure)</li>
+                            <li><strong>Day 25:</strong> Model versioning with MLflow/DVC</li>
+                            <li><strong>Day 26:</strong> CI/CD for ML with GitHub Actions</li>
+                            <li><strong>Day 27:</strong> Model monitoring & drift detection</li>
+                            <li><strong>Day 28:</strong> A/B testing for ML models</li>
+                        </ul>
+                    </div>
+                    <div class="practice-box">
+                        <h5>🎯 Week 4 Goal</h5>
+                        <p>Deploy a full ML pipeline with automated retraining</p>
+                    </div>
+                    <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>Week 4 Complete</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 9-10: Advanced Topics -->
+        <div class="week-content" id="week5">
+            <div class="milestone">
+                <h3>🔬 Phase 5: Advanced AI Topics</h3>
+                <p>Reinforcement learning, generative AI, advanced architectures</p>
+            </div>
+
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">29-35</div>
+                    <div class="day-title">Cutting-edge AI</div>
+                    <div class="time-badge">2 hours/day</div>
+                </div>
+                <div class="day-content">
+                    <div class="session">
+                        <h4>📅 Advanced Topics</h4>
+                        <ul>
+                            <li><strong>Day 29:</strong> Reinforcement Learning basics (Q-learning)</li>
+                            <li><strong>Day 30:</strong> OpenAI Gym environment, train an agent</li>
+                            <li><strong>Day 31:</strong> Generative Adversarial Networks (GANs)</li>
+                            <li><strong>Day 32:</strong> Variational Autoencoders (VAEs)</li>
+                            <li><strong>Day 33:</strong> Attention mechanisms & Vision Transformers</li>
+                            <li><strong>Day 34:</strong> Large Language Models (LLMs) fine-tuning</li>
+                            <li><strong>Day 35:</strong> AI Ethics & Bias detection</li>
+                        </ul>
+                    </div>
+                    <div class="practice-box">
+                        <h5>🎯 Week 5 Goal</h5>
+                        <p>Train a GAN to generate realistic images</p>
+                    </div>
+                    <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>Week 5 Complete</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Week 11-12: Specialization & Portfolio -->
+        <div class="week-content" id="week6">
+            <div class="milestone">
+                <h3>🎯 Phase 6: Specialization & Portfolio</h3>
+                <p>Choose your specialty, build impressive projects</p>
+            </div>
+
+            <div class="day-card">
+                <div class="day-header">
+                    <div class="day-number">36-42</div>
+                    <div class="day-title">Portfolio Projects</div>
+                    <div class="time-badge">2 hours/day</div>
+                </div>
+                <div class="day-content">
+                    <div class="session">
+                        <h4>🎯 Choose Your Specialization</h4>
+                        <ul>
+                            <li><strong>Computer Vision:</strong> Build an object detection system</li>
+                            <li><strong>NLP:</strong> Create a document Q&A system</li>
+                            <li><strong>MLOps:</strong> Build an end-to-end ML platform</li>
+                            <li><strong>AI Research:</strong> Implement recent paper findings</li>
+                        </ul>
+                    </div>
+                    <div class="session">
+                        <h4>📅 Final Week Goals</h4>
+                        <ul>
+                            <li><strong>Days 36-39:</strong> Build 2-3 impressive portfolio projects</li>
+                            <li><strong>Days 40-41:</strong> Create technical blog posts/documentation</li>
+                            <li><strong>Day 42:</strong> Portfolio review & next steps planning</li>
+                        </ul>
+                    </div>
+                    <div class="practice-box">
+                        <h5>🎯 Final Goal</h5>
+                        <p>Complete portfolio ready for AI/ML job applications</p>
+                    </div>
+                    <div class="checkbox-container" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>Program Complete! 🎉</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showWeek(weekNum) {
+            // Hide all week contents
+            const contents = document.querySelectorAll('.week-content');
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all buttons
+            const buttons = document.querySelectorAll('.week-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected week
+            document.getElementById(`week${weekNum}`).classList.add('active');
+            event.target.classList.add('active');
+            
+            // Update progress bar
+            const progress = (weekNum / 6) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        function toggleCheckbox(container) {
+            const checkbox = container.querySelector('.checkbox');
+            checkbox.classList.toggle('checked');
+            
+            // Update progress based on checked items
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checkbox');
+            const checkedBoxes = document.querySelectorAll('.checkbox.checked');
+            const progress = (checkedBoxes.length / checkboxes.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        // Initialize progress
+        updateProgress();
+    </script>
+</body>
+</html>
